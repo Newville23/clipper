@@ -1,0 +1,23 @@
+.App {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7f9fb;
+  max-width: 1440px;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  border-radius: 6px;
+  font-size: calc(10px + 2vmin);
+  min-height: 650px;
+  color: #233034;
+  padding: 40px;
+}
+
+.container {
+}
