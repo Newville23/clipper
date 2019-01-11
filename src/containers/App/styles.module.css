@@ -19,5 +19,111 @@
   padding: 40px;
 }
 
-.container {
+// Range time style
+.disabled .slider {
+  background: #cccccc;
+  border: 1px solid #cccccc;
+  box-shadow: none;
+  transform: none;
+}
+
+.slider {
+  appearance: none;
+  background: #f55700;
+  border: 2px solid #ffffff;
+  border-radius: 100%;
+  cursor: pointer;
+  display: block;
+  height: 16px;
+  margin-left: -10px;
+  margin-top: -12px;
+  outline: none;
+  position: absolute;
+  top: 50%;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  width: 16px;
+
+  &:active {
+    transform: scale(1.3);
+  }
+
+  &:focus {
+    box-shadow: 0 0 0 5px rgba(63, 81, 181, 0.2);
+  }
+}
+
+.slider-container {
+  transition: left 0.3s ease-out;
+}
+
+.label {
+  color: #aaaaaa;
+  font-size: 0.8rem;
+  transform: translateZ(0);
+  white-space: nowrap;
+}
+
+.label-min,
+.label-max {
+  bottom: -1rem;
+  position: absolute;
+}
+
+.label-min {
+  composes: label;
+  left: 0;
+}
+
+.label-max {
+  composes: label;
+  right: 0;
+}
+
+.label-value {
+  composes: label;
+  position: absolute;
+  top: -1.8rem;
+}
+
+.label-container {
+  left: -50%;
+  position: relative;
+}
+
+.label-max .label-container {
+  left: 50%;
+}
+
+.track {
+  background: #eeeeee;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  display: block;
+  height: 0.3rem;
+  position: relative;
+  transition: left 0.3s ease-out, width 0.3s ease-out;
+}
+
+.disabled .track {
+  background: #eeeeee;
+}
+
+.track-background {
+  composes: track;
+  left: 0;
+  margin-top: -0.15rem;
+  position: absolute;
+  right: 0;
+  top: 50%;
+}
+
+.track-active {
+  composes: track;
+  background: #f55700;
+}
+
+.range {
+  height: 1rem;
+  position: relative;
+  width: 100%;
 }
