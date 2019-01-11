@@ -139,15 +139,23 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
 
     this.handleClipFormSubmit = this.handleClipFormSubmit.bind(this)
     this.handleOnChange = this.handleOnChange.bind(this)
+    this.timeFormating = this.timeFormating.bind(this)
   }
 
   public handleClipFormSubmit(e: React.FormEvent) {
     e.preventDefault()
+    {
+      /* TODO: Should call the creatae clip action */
+    }
     console.log('submitting clip')
   }
 
   public handleOnChange(name: string) {
     this.setState({ name })
+  }
+
+  public timeFormating(value: number) {
+    return new Date(value * 1000).toISOString().substr(11, 8)
   }
 
   public render() {
@@ -168,7 +176,7 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
       <div>
         <form onSubmit={this.handleClipFormSubmit}>
           <InputRange
-            formatLabel={value => new Date(value * 1000).toISOString().substr(11, 8)}
+            formatLabel={value => this.timeFormating(value)}
             maxValue={this.props.videoDuration}
             minValue={0}
             value={this.state.timeValue}
@@ -181,8 +189,8 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
             value={this.state.name}
             onChange={e => this.handleOnChange(e.target.value)}
           />
-          <div>Start time: {this.state.timeValue.min}</div>
-          <div>End time: {this.state.timeValue.max}</div>
+          <div>Start time: {this.timeFormating(this.state.timeValue.min)}</div>
+          <div>End time: {this.timeFormating(this.state.timeValue.max)}</div>
           <button type="submit">Clip</button>
         </form>
       </div>

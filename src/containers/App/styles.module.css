@@ -80,6 +80,7 @@
 }
 
 .label-value {
+  display: none;
   composes: label;
   position: absolute;
   top: -1.8rem;
