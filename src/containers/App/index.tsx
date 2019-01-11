@@ -1,15 +1,9 @@
 import React from 'react'
 import styles from './styles.module.css'
-
+import { Clip } from '../../typings'
 //this imports are related with the ClipForm Component
 import InputRange, { InputRangeProps } from 'react-input-range'
-
-interface Clip {
-  name: string
-  startTime: number
-  endTime?: number
-  tags?: Array<string>
-}
+import { formatClipTime } from '../../services/clips'
 
 /**
  * This is my top App component
@@ -38,6 +32,12 @@ class App extends React.Component<{}, AppState> {
     this.handleChangeUrl = this.handleChangeUrl.bind(this)
     this.handleSubmitUrl = this.handleSubmitUrl.bind(this)
     this.handleLoadMetadata = this.handleLoadMetadata.bind(this)
+
+    {
+      /** TODO: change methods for redux actions */
+    }
+
+    this.handleCreateClip = this.handleCreateClip.bind(this)
   }
 
   public handleLoadMetadata(videoRef: HTMLVideoElement | null) {
@@ -48,6 +48,10 @@ class App extends React.Component<{}, AppState> {
 
   public handleChangeUrl(value: string) {
     this.setState({ videoUrl: value })
+  }
+
+  public handleCreateClip(clip: Clip) {
+    this.setState({ clipList: [...this.state.clipList, clip] })
   }
 
   public handleSubmitUrl() {
@@ -81,7 +85,7 @@ class App extends React.Component<{}, AppState> {
               validUrl={this.state.submitSuccess}
               onHandleLoadMetadata={this.handleLoadMetadata}
             />
-            <ClipForm videoDuration={videoDuration} />
+            <ClipForm videoDuration={videoDuration} onHandleCreateClip={this.handleCreateClip} />
           </div>
           <div className={styles.container}>
             <VideoForm
@@ -107,6 +111,7 @@ class App extends React.Component<{}, AppState> {
 
 interface ClipFormProps {
   videoDuration: number
+  onHandleCreateClip: (clip: Clip) => void
   name?: string
   startTime?: number
   endTime?: number
@@ -119,11 +124,12 @@ interface TimeValue {
 }
 
 {
-  /*TODO: Improve the optional type for timeValue*/
+  /*TODO: Improve the optional type for timeValue property*/
 }
 interface ClipFormState {
   name: string
   timeValue: TimeValue | any
+  tags?: Array<string>
 }
 
 class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
@@ -139,7 +145,6 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
 
     this.handleClipFormSubmit = this.handleClipFormSubmit.bind(this)
     this.handleOnChange = this.handleOnChange.bind(this)
-    this.timeFormating = this.timeFormating.bind(this)
   }
 
   public handleClipFormSubmit(e: React.FormEvent) {
@@ -147,15 +152,20 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
     {
       /* TODO: Should call the creatae clip action */
     }
-    console.log('submitting clip')
+
+    this.props.onHandleCreateClip({
+      name: this.state.name,
+      startTime: this.state.timeValue.min,
+      endTime: this.state.timeValue.max
+    })
+    this.setState({
+      name: '',
+      timeValue: { min: 0, max: 5 }
+    })
   }
 
   public handleOnChange(name: string) {
     this.setState({ name })
-  }
-
-  public timeFormating(value: number) {
-    return new Date(value * 1000).toISOString().substr(11, 8)
   }
 
   public render() {
@@ -176,7 +186,7 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
       <div>
         <form onSubmit={this.handleClipFormSubmit}>
           <InputRange
-            formatLabel={value => this.timeFormating(value)}
+            formatLabel={value => formatClipTime(value)}
             maxValue={this.props.videoDuration}
             minValue={0}
             value={this.state.timeValue}
@@ -189,9 +199,11 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
             value={this.state.name}
             onChange={e => this.handleOnChange(e.target.value)}
           />
-          <div>Start time: {this.timeFormating(this.state.timeValue.min)}</div>
-          <div>End time: {this.timeFormating(this.state.timeValue.max)}</div>
-          <button type="submit">Clip</button>
+          <div>Start time: {formatClipTime(this.state.timeValue.min)}</div>
+          <div>End time: {formatClipTime(this.state.timeValue.max)}</div>
+          <button type="submit" disabled={this.state.name === ''}>
+            Clip
+          </button>
         </form>
       </div>
     )
@@ -288,11 +300,11 @@ class ClipList extends React.Component<ClipListProps> {
     const { video, clips } = this.props
     return (
       <div>
-        {clips.map(clip => {
+        {clips.map((clip, idx) => {
           const start = clip.startTime.toString()
           const end = clip.endTime ? clip.endTime.toString() : ''
           return (
-            <div className={styles.clip} key={clip.name}>
+            <div className={styles.clip} key={idx}>
               <video no-controls="true" width="170" height="96">
                 <source src={`${video}#t=${start},${end}`} type="video/mp4" />
               </video>
