@@ -5,6 +5,8 @@ import { Clip } from '../../typings'
 import InputRange, { InputRangeProps } from 'react-input-range'
 import { formatClipTime } from '../../services/clips'
 
+//This is a set of imports related with the clipList component
+
 /**
  * This is my top App component
  */
@@ -14,6 +16,7 @@ interface AppState {
   videoDuration: number
   submitSuccess: boolean
   currentClip: Clip
+  editClip?: number
   clipList: Array<Clip>
 }
 
@@ -32,6 +35,9 @@ class App extends React.Component<{}, AppState> {
     this.handleChangeUrl = this.handleChangeUrl.bind(this)
     this.handleSubmitUrl = this.handleSubmitUrl.bind(this)
     this.handleLoadMetadata = this.handleLoadMetadata.bind(this)
+    this.handleSetCurrentClip = this.handleSetCurrentClip.bind(this)
+    this.handleDeleteClip = this.handleDeleteClip.bind(this)
+    this.handleSetEdit = this.handleSetEdit.bind(this)
 
     {
       /** TODO: change methods for redux actions */
@@ -54,6 +60,36 @@ class App extends React.Component<{}, AppState> {
     this.setState({ clipList: [...this.state.clipList, clip] })
   }
 
+  public handleEditClip(clip: Clip) {
+    this.setState(state => {
+      const clipList = state.clipList.map((item, idx) => {
+        if (idx === this.state.editClip) {
+          return clip
+        }
+        return item
+      })
+    })
+  }
+
+  public handleSetEdit(id: number) {
+    this.setState({
+      editClip: id
+    })
+  }
+
+  public handleDeleteClip(id: number) {
+    this.setState({
+      clipList: [...this.state.clipList.slice(0, id), ...this.state.clipList.slice(id + 1)]
+    })
+  }
+
+  public handleSetCurrentClip(id: number) {
+    const currentClip = this.state.clipList[id]
+    this.setState({
+      currentClip
+    })
+  }
+
   public handleSubmitUrl() {
     this.setState(
       {
@@ -63,7 +99,6 @@ class App extends React.Component<{}, AppState> {
         if (this.state.submitSuccess) {
           const defaultClip: Clip = { name: 'Default Video', startTime: 0 }
           const clips: Clip[] = [defaultClip]
-          console.log(clips)
           this.setState({
             clipList: clips
           })
@@ -85,7 +120,12 @@ class App extends React.Component<{}, AppState> {
               validUrl={this.state.submitSuccess}
               onHandleLoadMetadata={this.handleLoadMetadata}
             />
-            <ClipForm videoDuration={videoDuration} onHandleCreateClip={this.handleCreateClip} />
+            <ClipForm
+              editClip={this.state.editClip}
+              videoDuration={videoDuration}
+              onHandleCreateClip={this.handleCreateClip}
+              onHandleEditClip={this.handleEditClip}
+            />
           </div>
           <div className={styles.container}>
             <VideoForm
@@ -94,7 +134,13 @@ class App extends React.Component<{}, AppState> {
               onHandleSubmitUrl={this.handleSubmitUrl}
             />
             {videoUrl ? (
-              <ClipList video={videoUrl} clips={clipList} />
+              <ClipList
+                video={videoUrl}
+                clips={clipList}
+                onHandleSetCurrentClip={this.handleSetCurrentClip}
+                onHandleDeleteClip={this.handleDeleteClip}
+                onHandleSetEdit={this.handleSetEdit}
+              />
             ) : (
               <div>Please provide a url for Video</div>
             )}
@@ -110,12 +156,10 @@ class App extends React.Component<{}, AppState> {
  */
 
 interface ClipFormProps {
+  editClip?: number
   videoDuration: number
   onHandleCreateClip: (clip: Clip) => void
-  name?: string
-  startTime?: number
-  endTime?: number
-  tags?: Array<string>
+  onHandleEditClip: (clip: Clip) => void
 }
 
 interface TimeValue {
@@ -152,12 +196,19 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
     {
       /* TODO: Should call the creatae clip action */
     }
-
-    this.props.onHandleCreateClip({
-      name: this.state.name,
-      startTime: this.state.timeValue.min,
-      endTime: this.state.timeValue.max
-    })
+    if (this.props.editClip) {
+      this.props.onHandleEditClip({
+        name: this.state.name,
+        startTime: this.state.timeValue.min,
+        endTime: this.state.timeValue.max
+      })
+    } else {
+      this.props.onHandleCreateClip({
+        name: this.state.name,
+        startTime: this.state.timeValue.min,
+        endTime: this.state.timeValue.max
+      })
+    }
     this.setState({
       name: '',
       timeValue: { min: 0, max: 5 }
@@ -169,6 +220,7 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
   }
 
   public render() {
+    const { editClip } = this.props
     const defaultClassNames = {
       activeTrack: styles['track-active'],
       disabledInputRange: styles['disabled'],
@@ -201,8 +253,9 @@ class ClipForm extends React.Component<ClipFormProps, ClipFormState> {
           />
           <div>Start time: {formatClipTime(this.state.timeValue.min)}</div>
           <div>End time: {formatClipTime(this.state.timeValue.max)}</div>
+
           <button type="submit" disabled={this.state.name === ''}>
-            Clip
+            {editClip ? 'Update' : 'Clip'}
           </button>
         </form>
       </div>
@@ -277,6 +330,7 @@ class VideoPlayer extends React.Component<VideoPlayerProps> {
             onLoadedMetadata={() => onHandleLoadMetadata(this.videoRef.current)}
             controls
             width="600"
+            autoPlay
           />
         ) : (
           <p>Please enter a valid Url</p>
@@ -293,10 +347,33 @@ class VideoPlayer extends React.Component<VideoPlayerProps> {
 interface ClipListProps {
   video: string
   clips: Array<Clip>
+  onHandleSetCurrentClip: (id: number) => void
+  onHandleDeleteClip: (id: number) => void
+  onHandleSetEdit: (id: number) => void
 }
 
 class ClipList extends React.Component<ClipListProps> {
-  render() {
+  constructor(props: ClipListProps) {
+    super(props)
+
+    this.handleEditClip = this.handleEditClip.bind(this)
+    this.handleDeleteClip = this.handleDeleteClip.bind(this)
+    this.handlePlayClip = this.handlePlayClip.bind(this)
+  }
+
+  public handleEditClip(id: number) {
+    this.props.onHandleSetEdit(id)
+  }
+
+  public handleDeleteClip(id: number) {
+    this.props.onHandleDeleteClip(id)
+  }
+
+  public handlePlayClip(id: number) {
+    this.props.onHandleSetCurrentClip(id)
+  }
+
+  public render() {
     const { video, clips } = this.props
     return (
       <div>
@@ -305,12 +382,24 @@ class ClipList extends React.Component<ClipListProps> {
           const end = clip.endTime ? clip.endTime.toString() : ''
           return (
             <div className={styles.clip} key={idx}>
-              <video no-controls="true" width="170" height="96">
-                <source src={`${video}#t=${start},${end}`} type="video/mp4" />
-              </video>
-              <div className={styles.clipName}>{clip.name}</div>
-              <div className={styles.clipTime}>{`Start: ${start}`}</div>
-              {clip.endTime && <div className={styles.clipTime}>{`End: ${clip.endTime}`}</div>}
+              <div className={styles.videoThumbnail} onClick={() => this.handlePlayClip(idx)}>
+                <video no-controls="true" width="170" height="96">
+                  <source src={`${video}#t=${start},${end}`} type="video/mp4" />
+                </video>
+              </div>
+              <div className={styles.videoBody}>
+                <div className={styles.clipName}>{clip.name}</div>
+                <div className={styles.clipTime}>{`Start: ${formatClipTime(clip.startTime)}`}</div>
+                {clip.endTime && (
+                  <div className={styles.clipTime}>{`End: ${formatClipTime(clip.endTime)}`}</div>
+                )}
+                {idx !== 0 && (
+                  <div className={styles.buttons}>
+                    <button onClick={() => this.handleEditClip(idx)}>Edit</button>
+                    <button onClick={() => this.handleDeleteClip(idx)}>Delete</button>
+                  </div>
+                )}
+              </div>
             </div>
           )
         })}
