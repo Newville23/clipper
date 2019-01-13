@@ -1,6 +1,10 @@
 export interface Clip {
-  name: string
-  startTime: number
-  endTime?: number
+  name?: string
+  timeRange?: TimeValue | any
   tags?: Array<string>
+}
+
+interface TimeValue {
+  min: number
+  max: number
 }
