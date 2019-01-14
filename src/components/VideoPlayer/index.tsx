@@ -1,4 +1,6 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { AppState } from '../../typings/actions'
 import { Clip } from '../../typings'
 
 interface VideoPlayerProps {
@@ -36,4 +38,14 @@ class VideoPlayer extends React.Component<VideoPlayerProps> {
   }
 }
 
-export default VideoPlayer
+const mapStateToProps = (state: AppState) => ({
+  clips: state.clipList,
+  videoUrl: state.videoUrl,
+  playingClip: state.playingClip,
+  validUrl: state.validUrl
+})
+
+export default connect(
+  mapStateToProps,
+  {}
+)(VideoPlayer)

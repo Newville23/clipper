@@ -1,9 +1,12 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { AppState } from '../../typings/actions'
 //import styles from './styles.module.css'
+import { setVideoUrl } from '../../actions'
 
 interface VideoFormProps {
   videoUrl: string
-  onHandleChangeUrl: (value: string) => void
+  setVideoUrl: (value: string) => void
   onHandleSubmitUrl: () => void
 }
 
@@ -25,7 +28,7 @@ class VideoForm extends React.Component<VideoFormProps> {
         <form onSubmit={this.handleSubmit}>
           <input
             value={this.props.videoUrl}
-            onChange={e => this.props.onHandleChangeUrl(e.target.value)}
+            onChange={e => this.props.setVideoUrl(e.target.value)}
             type="text"
           />
           <button type="submit">Next</button>
@@ -35,4 +38,11 @@ class VideoForm extends React.Component<VideoFormProps> {
   }
 }
 
-export default VideoForm
+const mapStateToProps = (state: AppState) => ({
+  videoUrl: state.videoUrl
+})
+
+export default connect(
+  mapStateToProps,
+  { setVideoUrl }
+)(VideoForm)

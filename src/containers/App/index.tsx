@@ -1,58 +1,66 @@
 import React from 'react'
-import styles from './styles.module.css'
+import { connect } from 'react-redux'
 import { Clip } from '../../typings'
+import { AppState } from '../../typings/actions'
 import { ClipForm, ClipList, VideoForm, VideoPlayer } from '../../components'
+import { setVideoDuration, setPlayingClip, setValidUrl } from '../../actions'
+import styles from './styles.module.css'
+import clipreducer from '../../reducers/clips'
 
-/**
- * This is my top App component
- */
-
-interface AppState {
+interface AppProps {
   videoUrl: string
   videoDuration: number
-  submitSuccess: boolean
+  validUrl: boolean
   currentClip: Clip
   isEditing: boolean
-  editClip?: number
+  editClip?: number | null
   playingClip: number
   clipList: Array<Clip>
+  setVideoDuration: (videoDuration: number) => void
+  setValidUrl: (value: boolean) => void
+  setPlayingClip: (value: number) => void
 }
 
-class App extends React.Component<{}, AppState> {
-  constructor(props: {}) {
+class App extends React.Component<AppProps> {
+  videoRef?: HTMLVideoElement | null
+  constructor(props: AppProps) {
     super(props)
-
-    this.state = {
-      videoUrl: 'https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4',
-      videoDuration: 10,
-      submitSuccess: false,
-      isEditing: false,
-      currentClip: { name: '', timeRange: { min: 0, max: 5 } },
-      playingClip: 0,
-      clipList: []
-    }
-
-    this.handleChangeUrl = this.handleChangeUrl.bind(this)
-    this.handleSubmitUrl = this.handleSubmitUrl.bind(this)
+    this.videoRef
     this.handleLoadMetadata = this.handleLoadMetadata.bind(this)
+    this.handleSubmitUrl = this.handleSubmitUrl.bind(this)
+    this.handleSetPlaying = this.handleSetPlaying.bind(this)
+    /*     this.handleChangeUrl = this.handleChangeUrl.bind(this)
+ 
+   
     this.handleSetCurrentClip = this.handleSetCurrentClip.bind(this)
     this.handleDeleteClip = this.handleDeleteClip.bind(this)
     this.handleSetEdit = this.handleSetEdit.bind(this)
     this.handleEditClip = this.handleEditClip.bind(this)
-    this.handleSetPlaying = this.handleSetPlaying.bind(this)
 
-    {
-      /** TODO: change methods for redux actions */
-    }
 
-    this.handleCreateClip = this.handleCreateClip.bind(this)
+
+    this.handleCreateClip = this.handleCreateClip.bind(this) */
   }
 
   public handleLoadMetadata(videoRef: HTMLVideoElement | null) {
     if (videoRef) {
-      this.setState({ videoDuration: videoRef.duration })
+      this.videoRef = videoRef
+      this.props.setVideoDuration(videoRef.duration)
     }
   }
+
+  public handleSubmitUrl() {
+    this.props.setValidUrl(true)
+  }
+
+  public handleSetPlaying(id: number) {
+    this.props.setPlayingClip(id)
+    if (this.videoRef) {
+      this.videoRef.load()
+      this.videoRef.play()
+    }
+  }
+  /*  
 
   public handleChangeUrl(value: string) {
     this.setState({ videoUrl: value })
@@ -97,11 +105,7 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
-  public handleSetPlaying(id: number) {
-    this.setState({
-      playingClip: id
-    })
-  }
+
 
   public handleSetCurrentClip(clip: Clip) {
     // @ts-ignore
@@ -111,61 +115,21 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
-  public handleSubmitUrl() {
-    this.setState(
-      {
-        submitSuccess: true
-      },
-      () => {
-        if (this.state.submitSuccess) {
-          const defaultClip: Clip = { name: 'Default Video', timeRange: { min: 0, max: 0 } }
-          const clips: Clip[] = [defaultClip]
-          this.setState({
-            clipList: clips
-          })
-        }
-      }
-    )
-  }
+  */
 
   public render() {
-    const { videoUrl, videoDuration, currentClip, clipList } = this.state
     //https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4
     return (
       <div className={styles.App}>
         <div className={styles.wrapper}>
           <div className={styles.container}>
-            <VideoPlayer
-              clips={this.state.clipList}
-              videoUrl={videoUrl}
-              playingClip={this.state.playingClip}
-              validUrl={this.state.submitSuccess}
-              onHandleLoadMetadata={this.handleLoadMetadata}
-            />
-            <ClipForm
-              currentClip={this.state.currentClip}
-              editClip={this.state.editClip}
-              isEditing={this.state.isEditing}
-              videoDuration={videoDuration}
-              onHandleSetCurrentClip={this.handleSetCurrentClip}
-              onHandleCreateClip={this.handleCreateClip}
-              onHandleEditClip={this.handleEditClip}
-            />
+            <VideoPlayer onHandleLoadMetadata={this.handleLoadMetadata} />
+            <ClipForm />
           </div>
           <div className={styles.container}>
-            <VideoForm
-              videoUrl={this.state.videoUrl}
-              onHandleChangeUrl={this.handleChangeUrl}
-              onHandleSubmitUrl={this.handleSubmitUrl}
-            />
-            {videoUrl ? (
-              <ClipList
-                video={videoUrl}
-                clips={clipList}
-                onHandleSetPlaying={this.handleSetPlaying}
-                onHandleDeleteClip={this.handleDeleteClip}
-                onHandleSetEdit={this.handleSetEdit}
-              />
+            <VideoForm onHandleSubmitUrl={this.handleSubmitUrl} />
+            {this.props.videoUrl && this.props.validUrl ? (
+              <ClipList onHandleSetPlaying={this.handleSetPlaying} />
             ) : (
               <div>Please provide a url for Video</div>
             )}
@@ -176,4 +140,18 @@ class App extends React.Component<{}, AppState> {
   }
 }
 
-export default App
+const mapStateToProps = (state: AppState) => ({
+  videoUrl: state.videoUrl,
+  videoDuration: state.videoDuration,
+  validUrl: state.validUrl,
+  currentClip: state.currentClip,
+  isEditing: state.isEditing,
+  editClip: state.editClip,
+  playingClip: state.playingClip,
+  clipList: state.clipList
+})
+
+export default connect(
+  mapStateToProps,
+  { setVideoDuration, setPlayingClip, setValidUrl }
+)(App)

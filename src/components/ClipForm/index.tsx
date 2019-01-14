@@ -1,17 +1,21 @@
 import React, { ChangeEvent } from 'react'
+import { connect } from 'react-redux'
+import { createClip, updateClip, setCurrentClip, cancelEdit } from '../../actions/index'
+import { AppState } from '../../typings/actions'
 import { Clip } from '../../typings'
 import InputRange, { InputRangeProps } from 'react-input-range'
 import { formatClipTime } from '../../services/clips'
 import styles from './styles.module.css'
 
 interface ClipFormProps {
-  editClip?: number
+  editClip?: number | null
   isEditing: boolean
   currentClip: Clip
   videoDuration: number
-  onHandleSetCurrentClip: (clip: Clip) => void
-  onHandleCreateClip: () => void
-  onHandleEditClip: () => void
+  setCurrentClip: (clip: Clip) => void
+  createClip: (clip: Clip) => void
+  updateClip: (id: number, clip: Clip) => void
+  cancelEdit: () => void
 }
 
 class ClipForm extends React.Component<ClipFormProps> {
@@ -21,6 +25,7 @@ class ClipForm extends React.Component<ClipFormProps> {
       /*TODO: Assign the endTime as the video total duration*/
     }
     this.handleClipFormSubmit = this.handleClipFormSubmit.bind(this)
+    this.handleCancelUpdate = this.handleCancelUpdate.bind(this)
     this.handleOnChange = this.handleOnChange.bind(this)
   }
 
@@ -30,15 +35,19 @@ class ClipForm extends React.Component<ClipFormProps> {
       /* TODO: Should call the creatae clip action */
     }
     if (this.props.editClip && this.props.isEditing) {
-      this.props.onHandleEditClip()
+      this.props.updateClip(this.props.editClip, this.props.currentClip)
     } else {
-      this.props.onHandleCreateClip()
+      this.props.createClip(this.props.currentClip)
     }
   }
 
   public handleOnChange(e: React.FormEvent<HTMLInputElement>) {
     const target = e.currentTarget
-    this.props.onHandleSetCurrentClip({ [target.name]: target.value })
+    this.props.setCurrentClip({ [target.name]: target.value })
+  }
+
+  public handleCancelUpdate() {
+    this.props.cancelEdit()
   }
 
   public render() {
@@ -58,13 +67,13 @@ class ClipForm extends React.Component<ClipFormProps> {
 
     return (
       <div>
-        <form onSubmit={this.handleClipFormSubmit}>
+        <form>
           <InputRange
             formatLabel={value => formatClipTime(value)}
             maxValue={this.props.videoDuration}
             minValue={0}
             value={currentClip.timeRange}
-            onChange={timeRange => this.props.onHandleSetCurrentClip({ timeRange })}
+            onChange={timeRange => this.props.setCurrentClip({ timeRange })}
             classNames={defaultClassNames}
           />
           <input
@@ -77,13 +86,24 @@ class ClipForm extends React.Component<ClipFormProps> {
           <div>Start time: {formatClipTime(currentClip.timeRange.min)}</div>
           <div>End time: {formatClipTime(currentClip.timeRange.max)}</div>
 
-          <button type="submit" disabled={currentClip.name === ''}>
+          <button onClick={this.handleClipFormSubmit} disabled={currentClip.name === ''}>
             {isEditing ? 'Update' : 'Clip'}
           </button>
+          {isEditing && <button onClick={this.handleCancelUpdate}>Cancel</button>}
         </form>
       </div>
     )
   }
 }
 
-export default ClipForm
+const mapStateToProps = (state: AppState) => ({
+  editClip: state.editClip,
+  isEditing: state.isEditing,
+  currentClip: state.currentClip,
+  videoDuration: state.videoDuration
+})
+
+export default connect(
+  mapStateToProps,
+  { updateClip, createClip, setCurrentClip, cancelEdit }
+)(ClipForm)

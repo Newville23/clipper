@@ -1,14 +1,17 @@
 import React from 'react'
+import { connect } from 'react-redux'
+import { AppState } from '../../typings/actions'
 import { Clip } from '../../typings'
 import { formatClipTime } from '../../services/clips'
+import { setEditClip, deleteClip } from '../../actions'
 import styles from './styles.module.css'
 
 interface ClipListProps {
   video: string
   clips: Array<Clip>
   onHandleSetPlaying: (id: number) => void
-  onHandleDeleteClip: (id: number) => void
-  onHandleSetEdit: (id: number) => void
+  deleteClip: (id: number) => void
+  setEditClip: (id: number) => void
 }
 
 class ClipList extends React.Component<ClipListProps> {
@@ -21,11 +24,11 @@ class ClipList extends React.Component<ClipListProps> {
   }
 
   public handleEditClip(id: number) {
-    this.props.onHandleSetEdit(id)
+    this.props.setEditClip(id)
   }
 
   public handleDeleteClip(id: number) {
-    this.props.onHandleDeleteClip(id)
+    this.props.deleteClip(id)
   }
 
   public handlePlayClip(id: number) {
@@ -71,4 +74,12 @@ class ClipList extends React.Component<ClipListProps> {
   }
 }
 
-export default ClipList
+const mapStateToProps = (state: AppState) => ({
+  video: state.videoUrl,
+  clips: state.clipList
+})
+
+export default connect(
+  mapStateToProps,
+  { setEditClip, deleteClip }
+)(ClipList)
