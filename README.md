@@ -5,6 +5,8 @@ Clipper is an application that allows you to slice ​up a video into clips.
 Example video url
 [https://download.blender.org/durian/trailer/sintel_trailer-480p.mp4]
 
+See Clipper Demo cliking here => [https://build-ixbupjlzgb.now.sh/] 
+
 ## Install
 
 ```
