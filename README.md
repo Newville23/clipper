@@ -1,4 +1,4 @@
-##Clipper
+# Clipper
 
 Clipper is an application that allows you to slice ​up a video into clips.
 
