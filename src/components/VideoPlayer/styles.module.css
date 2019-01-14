@@ -1,0 +1,16 @@
+.videoContainer {
+  width: 100%;
+}
+
+.defaultBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.videoTitle {
+  text-transform: capitalize;
+}

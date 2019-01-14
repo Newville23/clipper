@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css?family=Pacifico');
 .App {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   background-color: #f7f9fb;
@@ -9,12 +11,27 @@
 }
 
 .wrapper {
-  display: flex;
-  justify-content: space-between;
   background-color: #fff;
+  border: 1px solid #ff5262;
   border-radius: 6px;
   font-size: calc(10px + 2vmin);
   min-height: 650px;
+  min-width: 850px;
   color: #233034;
   padding: 40px;
+  margin-bottom: 40px;
+}
+
+.appBody {
+  display: flex;
+  justify-content: space-between;
+}
+
+.appHeader {
+  color: #9fafc7;
+  font-family: 'Pacifico', cursive;
+  font-size: 70px;
+  font-style: italic;
+  letter-spacing: 4px;
+  margin: 20px 0;
 }

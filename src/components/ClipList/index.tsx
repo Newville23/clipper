@@ -38,37 +38,51 @@ class ClipList extends React.Component<ClipListProps> {
   public render() {
     const { video, clips } = this.props
     return (
-      <div>
-        {clips.map((clip, idx) => {
-          const start = clip.timeRange.min.toString()
-          const end = clip.timeRange.max ? clip.timeRange.max.toString() : ''
-          return (
-            <div className={styles.clip} key={idx}>
-              <div className={styles.videoThumbnail} onClick={() => this.handlePlayClip(idx)}>
-                <video no-controls="true" width="170" height="96">
-                  <source src={`${video}#t=${start},${end}`} type="video/mp4" />
-                </video>
-              </div>
-              <div className={styles.videoBody}>
-                <div className={styles.clipName}>{clip.name}</div>
-                <div className={styles.clipTime}>{`Start: ${formatClipTime(
-                  clip.timeRange.min
-                )}`}</div>
-                {clip.timeRange.max && (
-                  <div className={styles.clipTime}>{`End: ${formatClipTime(
-                    clip.timeRange.max
-                  )}`}</div>
-                )}
-                {idx !== 0 && (
-                  <div className={styles.buttons}>
-                    <button onClick={() => this.handleEditClip(idx)}>Edit</button>
-                    <button onClick={() => this.handleDeleteClip(idx)}>Delete</button>
+      <div className={styles.clipListContainer}>
+        <div className={styles.listHeader}>My clip List</div>
+        <div className={styles.list}>
+          {clips.map((clip, idx) => {
+            const start = clip.timeRange.min.toString()
+            const end = clip.timeRange.max ? clip.timeRange.max.toString() : ''
+            return (
+              <div className={styles.clip} key={idx}>
+                <div className={styles.videoThumbnail} onClick={() => this.handlePlayClip(idx)}>
+                  <video no-controls="true" width="170" height="96">
+                    <source src={`${video}#t=${start},${end}`} type="video/mp4" />
+                  </video>
+                </div>
+                <div className={styles.videoBody}>
+                  <div className={styles.clipName}>
+                    {clip.name && clip.name.length > 30
+                      ? clip.name.substr(0, 29) + '...'
+                      : clip.name}
                   </div>
-                )}
+                  {idx !== 0 && (
+                    <>
+                      <div className={styles.clipTime}>{`Start: ${formatClipTime(
+                        clip.timeRange.min
+                      )}`}</div>
+                      <div className={styles.clipTime}>{`End: ${formatClipTime(
+                        clip.timeRange.max
+                      )}`}</div>
+                      <div className={styles.buttons}>
+                        <button className={styles.normal} onClick={() => this.handleEditClip(idx)}>
+                          Edit
+                        </button>
+                        <button
+                          className={styles.normal}
+                          onClick={() => this.handleDeleteClip(idx)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     )
   }

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { AppState } from '../../typings/actions'
-//import styles from './styles.module.css'
+import styles from './styles.module.css'
 import { setVideoUrl } from '../../actions'
 
 interface VideoFormProps {
@@ -25,13 +25,16 @@ class VideoForm extends React.Component<VideoFormProps> {
   public render() {
     return (
       <div>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.handleSubmit} className={styles.formVideo}>
           <input
+            className={styles.input}
             value={this.props.videoUrl}
             onChange={e => this.props.setVideoUrl(e.target.value)}
             type="text"
           />
-          <button type="submit">Next</button>
+          <button className={styles.normal} type="submit">
+            Start
+          </button>
         </form>
       </div>
     )

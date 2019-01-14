@@ -1,4 +1,13 @@
-// Range time style
+.header {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 2rem;
+}
+
+.rangeContainer {
+  padding: 30px 0;
+}
+
 .disabled .slider {
   background: #cccccc;
   border: 1px solid #cccccc;
@@ -8,7 +17,7 @@
 
 .slider {
   appearance: none;
-  background: #f55700;
+  background: #ff5262;
   border: 2px solid #ffffff;
   border-radius: 100%;
   cursor: pointer;
@@ -66,12 +75,12 @@
 }
 
 .label-container {
-  left: -50%;
+  left: 0;
   position: relative;
 }
 
 .label-max .label-container {
-  left: 50%;
+  left: 0;
 }
 
 .track {
@@ -99,11 +108,117 @@
 
 .track-active {
   composes: track;
-  background: #f55700;
+  background: #ff5262;
 }
 
 .range {
   height: 1rem;
   position: relative;
   width: 100%;
+}
+
+.formVideo {
+  display: flex;
+  max-width: 600px;
+  margin: 0 0 20px;
+}
+
+.button {
+  text-align: center;
+  display: inline-flex;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid transparent;
+  font-weight: 500;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.button:disabled,
+.button[disabled] {
+  color: #8798a4;
+  background-color: #e4e9ec;
+  border: 1px solid #e4e9ec;
+}
+
+.small {
+  height: 24px;
+  font-size: 14px;
+  line-height: 24px;
+  padding: 0 20px;
+}
+
+.normal {
+  composes: button small;
+  color: #fff;
+  background-color: #ff5262;
+
+  &:hover {
+    background-color: #ff5262;
+  }
+}
+
+.common {
+  font-size: 14px;
+  border: 1px solid #dddddd;
+  padding: 0 12px 1px;
+  border-radius: 4px;
+  color: #062028;
+  box-sizing: border-box;
+  outline: none;
+  width: 100%;
+
+  &:focus {
+    border: 1px solid;
+    border-color: #087bcc !important;
+  }
+
+  &::placeholder {
+    color: #a7b5bf;
+  }
+
+  &[disabled] {
+    color: #8798a4;
+    background-color: #f4f5f7;
+    border-color: #f4f5f7;
+
+    &::placeholder {
+      color: #8798a4;
+    }
+  }
+}
+
+/* Input sizes */
+
+.small {
+  min-height: 36px;
+
+  & + .status {
+    top: calc((36px / 2) - (18px / 2));
+  }
+}
+
+.input {
+  composes: common small;
+
+  &.has-icon {
+    padding-right: 2rem;
+  }
+}
+
+.labelContainer {
+  display: flex;
+}
+
+.timeLabel {
+  color: #606060;
+  margin: 15px 10px 15px 0;
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  display: flex;
 }

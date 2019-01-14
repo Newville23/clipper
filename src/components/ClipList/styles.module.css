@@ -1,0 +1,84 @@
+.clipListContainer {
+  margin-left: 20px;
+  margin-top: 20px;
+}
+
+.listHeader {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2rem;
+}
+
+.clip {
+  display: flex;
+  padding: 5px 0;
+}
+
+.videoBody {
+  margin-left: 10px;
+}
+.videoThumbnail {
+  background: rgba(0, 0, 0, 0.1);
+  height: 96px;
+  cursor: pointer;
+}
+
+.clipName {
+  text-transform: capitalize;
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.clipTime {
+  color: #606060;
+  padding: 2px 4px;
+  letter-spacing: 0.5px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  display: flex;
+}
+
+.buttons {
+  display: flex;
+}
+
+.button {
+  text-align: center;
+  display: inline-flex;
+  cursor: pointer;
+  outline: none;
+  border: 1px solid transparent;
+  font-weight: 500;
+  border-radius: 4px;
+  margin-right: 5px;
+
+  &[disabled] {
+    color: #8798a4;
+    background-color: #e4e9ec;
+    border: 1px solid #e4e9ec;
+
+    &:hover {
+      background-color: #e4e9ec;
+      border: 1px solid #e4e9ec;
+    }
+  }
+}
+
+.normal {
+  composes: button;
+  color: #fff;
+  background-color: #ff5262;
+
+  &:hover {
+    background-color: #ff5262;
+  }
+}
+
+.list {
+  max-height: 400px;
+  overflow-y: scroll;
+}
